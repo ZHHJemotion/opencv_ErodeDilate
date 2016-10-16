@@ -8,26 +8,57 @@
 
 #include <iostream>
 #include <opencv2/opencv.hpp>
-
+#include <opencv2/core/core.hpp>
+#include<opencv2/highgui/highgui.hpp>
+#include<opencv2/imgproc/imgproc.hpp>
+#include <string>
 
 using namespace cv;
 using namespace std;
+
+#define PATH string("/Users/zhangxingjian/Desktop/Programming/C++/OpenCV/opencv_test8/opencv_erode&dilate/opencv_erode&dilate/")
+
+
+// ---------------------------- global variables declaration section -------------------------
+//    Describe: global variables declaration 全局变量
+// ----------------------------------------------------------------------------------------
+Mat srcImage, dstImage; // 原图和效果图
+int trackbarNumber = 0; // 0 表示腐蚀 erode，1表示膨胀 dilate
+int structElementSize = 3; // 结构元素(内核矩阵)的尺寸
+
+
+// ---------------------------- global function declaration section -----------------------
+//    Describe: global function declaraion 全局函数
+// ---------------------------------------------------------------------------------------
+void process(); // 膨胀和腐蚀的处理函数
+void onTrackBarNumberChange(int, void *); // callback function
+void onElementSizeChange(int, void *); // callback function
+
+
+// --------------------------- main() function ---------------------------------
 
 int main(int argc, const char * argv[]) {
     // insert code here...
     std::cout << "Hello, World!\n";
     
-    VideoCapture cap(0);
-    if(!cap.isOpened()){
-        return -1;
-    }
-    Mat frame;
+    system("color 5E"); // change the color of the console
     
-    while(true){
-        cap>>frame;
-        imshow("当前视频", frame);
-        if(waitKey(30) >= 0) break;
+    //read image
+    srcImage = imread(PATH+string("1.jpg"),1);
+    //exception handling
+    if (!srcImage.data) {
+        printf("error: there is a error so we can't read the iamge 1.jpg");
+        return false;
     }
+    
+    // show the original image
+    namedWindow("原始图");
+    imshow("原始图", srcImage);
+    
+    //
     
     return 0;
 }
+
+
+
