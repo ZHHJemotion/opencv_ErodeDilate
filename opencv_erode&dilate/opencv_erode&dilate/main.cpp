@@ -23,7 +23,7 @@ using namespace std;
 //    Describe: global variables declaration 全局变量
 // ----------------------------------------------------------------------------------------
 Mat srcImage, dstImage; // 原图和效果图
-int trackbarNumber = 0; // 0 表示腐蚀 erode，1表示膨胀 dilate
+int trackbarNumber = 1; // 0 表示腐蚀 erode，1表示膨胀 dilate
 int structElementSize = 3; // 结构元素(内核矩阵)的尺寸
 
 
@@ -41,7 +41,7 @@ int main(int argc, const char * argv[]) {
     // insert code here...
     std::cout << "Hello, World!\n";
     
-    system("color 5E"); // change the color of the console
+    //system("color 5E"); // change the color of the console
     
     //read image
     srcImage = imread(PATH+string("1.jpg"),1);
@@ -55,10 +55,97 @@ int main(int argc, const char * argv[]) {
     namedWindow("原始图");
     imshow("原始图", srcImage);
     
+    // 进行初次腐蚀操作并显示效果图
+    namedWindow("效果图");
+    // 获得自定义核
+    Mat element = getStructuringElement(MORPH_RECT, Size(2*structElementSize+1, 2*structElementSize+1),Point(structElementSize, structElementSize));
+    erode(srcImage, dstImage, element);
+    imshow("效果图",  dstImage);
+    
+    // create a TrackBar
+    createTrackbar("腐蚀/膨胀", "效果图", &trackbarNumber, 1, onTrackBarNumberChange);
+    createTrackbar("内核尺寸", "效果图", &structElementSize, 21, onElementSizeChange);
+    
+    // output some helpful information
+    cout<<endl<<"\t "
+            <<""
+            <<"\n by ZHHJemotion";
     //
+    while (char(waitKey(1))!='q') {}
+    
+    
+    
+    
+    // ==============================================================================================
+    // doing the erode and dilate operation without using TrackBar 进行无轨迹条的腐蚀erode和膨胀dilate操作
+    // ==============================================================================================
+    Mat image = imread(PATH+string("1.jpg"),1);
+    namedWindow("original image");
+    imshow("original image", image); // 以上为载入并显示原图
+    
+    Mat outErode, outDilate; // 腐蚀与膨胀输出
+    
+    Mat element1 = getStructuringElement(MORPH_RECT, Size(7,7));
+    erode(image, outErode, element1); // 腐蚀操作
+    dilate(image, outDilate, element1); // 膨胀操作
+    
+    namedWindow("destination iamge of erode"); // 显示腐蚀效果图
+    imshow("destination iamge of erode", outErode);
+    
+    namedWindow("destination iamge of dilate"); // 显示膨胀效果图
+    imshow("destination iamge of dilate", outDilate);
+    
+    waitKey(0);
+    
+    
+    
+    
     
     return 0;
 }
+
+
+// ---------------------------- process() function --------------------------------
+//    Describe: 进行自定义的腐蚀和膨胀操作
+// --------------------------------------------------------------------------------
+void proces()
+{
+    // 获取自定义核
+    Mat element = getStructuringElement(MORPH_RECT, Size(2*structElementSize+1, 2*structElementSize+1), Point(structElementSize, structElementSize));
+    
+    // 进行腐蚀or 膨胀操作
+    if (trackbarNumber == 0) {
+        erode(srcImage, dstImage, element);
+    }
+    else
+    {
+        dilate(srcImage, dstImage, element);
+    }
+    
+    // show the result of erode or dilate operation
+    imshow("效果图", dstImage);
+}
+
+
+// ------------------------- onTrackBarNumberChange() funtion ---------------------------
+//    Describe: 腐蚀与膨胀之间切换开关的回调函数
+// --------------------------------------------------------------------------------------
+void onTrackBarNumberChange(int, void *)
+{
+    // 腐蚀与膨胀之间效果已经切换，回调函数体内需调用一次 process 函数，是改变后的效果立即生效并显示出来
+    proces();
+}
+
+
+// ------------------------- onElementSizeChange() function -----------------------------
+//    Describe: 腐蚀与膨胀操作内核改变时的回调函数
+// --------------------------------------------------------------------------------------
+void onElementSizeChange(int, void *)
+{
+    // 内核尺寸已经改变，回调函数体内需调用一次 process 函数，是改变后的效果立即生效并显示出来
+    proces();
+}
+
 
 
 
